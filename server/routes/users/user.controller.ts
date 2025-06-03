@@ -7,6 +7,7 @@ import { AuthRequest } from "../../middlewares/authMiddleware";
 import bcrypt from 'bcrypt'
 import { uploadOnCloudinary } from "../../shared/cloudinary";
 import { generateText } from "../../shared/textRecognition";
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "../../config";
 export const userController = {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -104,8 +105,8 @@ export const userController = {
       const { data: tokenResponse } = await axios.post(
         "https://github.com/login/oauth/access_token",
         {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          client_id: GITHUB_CLIENT_ID,
+          client_secret: GITHUB_CLIENT_SECRET,
           code: `${code}`,
         },
         {

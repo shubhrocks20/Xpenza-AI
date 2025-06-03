@@ -1,9 +1,10 @@
 import fs from 'fs';
 import axios from 'axios';
 import FormData from 'form-data';
+import { TABSCANNER_API_KEY, TABSCANNER_BASE_URL } from '../config';
 
-const API_KEY = process.env.TABSCANNER_API_KEY;
-const BASE_URL = process.env.TABSCANNER_BASE_URL;
+const API_KEY = TABSCANNER_API_KEY;
+const BASE_URL = TABSCANNER_BASE_URL;
 
 async function callProcess(filePath: string, params: Record<string, any> = {}) {
     try {

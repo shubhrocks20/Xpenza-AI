@@ -15,6 +15,7 @@ import {
   storeManualBill,
 } from "./bills.services";
 import { Category } from "@prisma/client";
+import { PREFIX_CONTENT } from "../../config";
 export const billController = {
   async manualBill(req: Request, res: Response, next: NextFunction) {
     const { merchantName, totalAmount, category, purchaseDate } = req.body;
@@ -95,7 +96,7 @@ export const billController = {
       )}`;
 
       const aiResponse = await generateText(
-        process.env.PREFIX_CONTENT + suffixContent
+       PREFIX_CONTENT + suffixContent
       );
       const extractedJsonMatch: any = aiResponse?.match(
         /```json\n([\s\S]*?)\n```/

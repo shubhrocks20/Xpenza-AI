@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { CLOUDINARY_URL } from '../config';
 
 
 
 cloudinary.config({
-  cloudinary_url: process.env.CLOUDINARY_URL,
+  cloudinary_url: CLOUDINARY_URL,
 });
 
 

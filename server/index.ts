@@ -5,11 +5,12 @@ import cors from "cors";
 import userRouter from "./routes/users/user.routes";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import billsRouter  from "./routes/bills/bills.routes";
+import { FRONTEND_URI } from "./config";
 const app = express();
 
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_URI}`,
+    origin: FRONTEND_URI,
     credentials: true,
   })
 );
