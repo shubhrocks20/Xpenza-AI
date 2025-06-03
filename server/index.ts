@@ -15,6 +15,9 @@ app.use(
 );
 
 app.use(express.json());
+app.use(`/health`, (req: Request, res: Response) => {
+  res.json({ status: "ok" });
+});
 app.use("/api/v1/users", userRouter);
 app.use(`/api/v1/bills`, billsRouter);
 

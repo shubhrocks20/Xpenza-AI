@@ -32,12 +32,12 @@ export const userController = {
       if(!user){
         return next(createHttpError(400, 'Invalid email or password'))
       }
-      if (password !== process.env.MASTER_PASSWORD) {
+      
         const isPasswordMatching = await bcrypt.compare(password, user.password as string)
         if (!isPasswordMatching) {
           return next(createHttpError(400, 'Invalid email or password'))
         }
-      }
+     
       const local_access_token = jwtHelper.generateToken({
         email: user.email,
         id: user.providerId,
@@ -65,7 +65,6 @@ export const userController = {
           headers: { Authorization: `Bearer ${access_token}` },
         }
       );
-      console.log(data);
 
       let user = await prisma.user.findUnique({
         where: { providerId: data.sub },
@@ -101,9 +100,7 @@ export const userController = {
     const { code } = req.query;
 
     try {
-      console.log("GitHub OAuth Started ✅");
 
-      // 1. Exchange code for an access token
       const { data: tokenResponse } = await axios.post(
         "https://github.com/login/oauth/access_token",
         {
@@ -118,7 +115,6 @@ export const userController = {
 
       const accessToken = tokenResponse.access_token;
 
-      // 2. Fetch user data from GitHub API
       const { data: githubUser } = await axios.get(
         "https://api.github.com/user",
         {
@@ -128,7 +124,6 @@ export const userController = {
 
       console.log("GitHub User Data:", githubUser);
 
-      // 3. Check if the user exists in the database
       let user = await prisma.user.findUnique({
         where: { providerId: githubUser.id.toString() },
       });
@@ -136,7 +131,6 @@ export const userController = {
 
       const altEmail = `${githubUser.login.toLowerCase()}@gmail.com`;
 
-      // 4. If the user doesn't exist, create a new record
       if (!user) {
         user = await prisma.user.create({
           data: {
@@ -149,13 +143,11 @@ export const userController = {
         });
       }
 
-      // 5. Generate JWT token
       const local_access_token = jwtHelper.generateToken({
         email: user.email,
         id: user.providerId,
       });
 
-      // 6. Set token as a cookie (Modify settings based on frontend needs)
       res.cookie("access_token", local_access_token, {
         httpOnly: false,
         secure: false,
@@ -226,8 +218,7 @@ export const userController = {
       if (req.file && req.file?.buffer) {
         updateData.avatar = await uploadOnCloudinary(req.file.buffer)
       }
-      console.log('🚒', updateData)
-      console.log('ID:', userId)
+     
 
       if (Object.keys(updateData).length === 0) {
 
