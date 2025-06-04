@@ -4,10 +4,10 @@ import createHttpError from "http-errors";
 import { prisma } from "../../prisma";
 import { jwtHelper } from "../../shared/jwtHelper";
 import { AuthRequest } from "../../middlewares/authMiddleware";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 import { uploadOnCloudinary } from "../../shared/cloudinary";
 import { generateText } from "../../shared/textRecognition";
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "../../config";
+import { ENV, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "../../config";
 export const userController = {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -17,44 +17,44 @@ export const userController = {
       return next(createHttpError(500, "Internal Server Error"));
     }
   },
-  async login(req: Request, res: Response, next: NextFunction){
-    const {emailOrUsername, password} = req.body;
+  async login(req: Request, res: Response, next: NextFunction) {
+    const { emailOrUsername, password } = req.body;
 
-    try{
+    try {
       const user = await prisma.user.findFirst({
         where: {
-          OR: [
-            { email: emailOrUsername },
-            { username: emailOrUsername }
-          ]
-        }
+          OR: [{ email: emailOrUsername }, { username: emailOrUsername }],
+        },
       });
 
-      if(!user){
-        return next(createHttpError(400, 'Invalid email or password'))
+      if (!user) {
+        return next(createHttpError(400, "Invalid email or password"));
       }
-      
-        const isPasswordMatching = await bcrypt.compare(password, user.password as string)
-        if (!isPasswordMatching) {
-          return next(createHttpError(400, 'Invalid email or password'))
-        }
-     
+
+      const isPasswordMatching = await bcrypt.compare(
+        password,
+        user.password as string
+      );
+      if (!isPasswordMatching) {
+        return next(createHttpError(400, "Invalid email or password"));
+      }
+
       const local_access_token = jwtHelper.generateToken({
         email: user.email,
         id: user.providerId,
       });
       res.cookie("access_token", local_access_token, {
-        httpOnly: false,
-        secure: false,
-        sameSite: false,
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.json({ success: true, message: "User successful login" });
-
-    } catch(err){
-      return next(createHttpError(500, 'Internal Server Error'))
+    } catch (err) {
+      return next(createHttpError(500, "Internal Server Error"));
     }
-
   },
   async googleAuth(req: Request, res: Response, next: NextFunction) {
     const { access_token } = req.query;
@@ -87,9 +87,11 @@ export const userController = {
         id: data.sub,
       });
       res.cookie("access_token", local_access_token, {
-        httpOnly: false,
-        secure: false,
-        sameSite: false,
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.json({ success: true, message: "User successful login" });
@@ -101,7 +103,6 @@ export const userController = {
     const { code } = req.query;
 
     try {
-
       const { data: tokenResponse } = await axios.post(
         "https://github.com/login/oauth/access_token",
         {
@@ -129,7 +130,6 @@ export const userController = {
         where: { providerId: githubUser.id.toString() },
       });
 
-
       const altEmail = `${githubUser.login.toLowerCase()}@gmail.com`;
 
       if (!user) {
@@ -150,9 +150,11 @@ export const userController = {
       });
 
       res.cookie("access_token", local_access_token, {
-        httpOnly: false,
-        secure: false,
-        sameSite: false,
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.json({ success: true, message: "User successfully logged in" });
@@ -179,87 +181,88 @@ export const userController = {
       return next(createHttpError(500, "Internal Server Error"));
     }
   },
-  async  updateUser(req: Request, res: Response, next: NextFunction) {
+  async updateUser(req: Request, res: Response, next: NextFunction) {
     const _req = req as AuthRequest;
     try {
-      const userId = _req.userId
+      const userId = _req.userId;
       if (!userId) {
-        return next(createHttpError(401, "Unauthorized"))
+        return next(createHttpError(401, "Unauthorized"));
       }
 
-      const { username, email, password } = req.body
-      console.log(req.body)
-      console.log(req.file)
-      const updateData: Record<string, any> = {}
+      const { username, email, password } = req.body;
+      console.log(req.body);
+      console.log(req.file);
+      const updateData: Record<string, any> = {};
 
       if (username) {
-        const existingUser = await prisma.user.findFirst({ where: { username } })
+        const existingUser = await prisma.user.findFirst({
+          where: { username },
+        });
         if (existingUser && existingUser.providerId !== String(userId)) {
-          return next(createHttpError(400, "Username already taken"))
-
+          return next(createHttpError(400, "Username already taken"));
         }
-        updateData.username = username
+        updateData.username = username;
       }
 
       if (email) {
-        const existingEmail = await prisma.user.findUnique({ where: { email } })
+        const existingEmail = await prisma.user.findUnique({
+          where: { email },
+        });
         if (existingEmail && existingEmail.providerId !== String(userId)) {
-
-          return next(createHttpError(400, "Email already in use"))
-
+          return next(createHttpError(400, "Email already in use"));
         }
-        updateData.email = email
+        updateData.email = email;
       }
 
       if (password) {
-        const hashedPassword = await bcrypt.hash(password, 10)
-        updateData.password = hashedPassword
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updateData.password = hashedPassword;
       }
 
       if (req.file && req.file?.buffer) {
-        updateData.avatar = await uploadOnCloudinary(req.file.buffer)
+        updateData.avatar = await uploadOnCloudinary(req.file.buffer);
       }
-     
 
       if (Object.keys(updateData).length === 0) {
-
-        return next(createHttpError(400, "No valid fields provided for update"))
+        return next(
+          createHttpError(400, "No valid fields provided for update")
+        );
       }
 
       const updatedUser = await prisma.user.update({
         where: { providerId: String(userId) },
         data: updateData,
-      })
+      });
 
-      res.json({ message: "User updated successfully", user: updatedUser })
+      res.json({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
-      next(error)
+      next(error);
     }
   },
   async askMeAnything(req: Request, res: Response, next: NextFunction) {
-    const {prompt} = req.body;
+    const { prompt } = req.body;
 
     const result = await generateText(prompt);
-    const jsonData = JSON.parse(JSON.stringify(result))
-    res.json({ message: jsonData })
+    const jsonData = JSON.parse(JSON.stringify(result));
+    res.json({ message: jsonData });
   },
   async userContext(req: Request, res: Response, next: NextFunction) {
     const { userId } = req.body;
 
     const user = await prisma.user.findUnique({
       where: {
-        id: Number(userId)
+        id: Number(userId),
       },
       include: {
         bills: true,
         budgets: true,
         financialGoals: true,
-      }
-    })
+      },
+    });
     if (!user) {
-      return next(createHttpError(404, "User not found"))
+      return next(createHttpError(404, "User not found"));
     }
 
-    res.json({ message: user })
-  }
-}
+    res.json({ message: user });
+  },
+};
