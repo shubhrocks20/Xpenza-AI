@@ -1,6 +1,5 @@
 import express from "express";
 import { NextFunction, Response, Request } from "express";
-import axios from "axios";
 import cors from "cors";
 import userRouter from "./routes/users/user.routes";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
@@ -8,6 +7,7 @@ import billsRouter  from "./routes/bills/bills.routes";
 import { FRONTEND_URI } from "./config";
 const app = express();
 
+app.set("trust proxy", 1);
 app.use(
   cors({
     origin: FRONTEND_URI,

@@ -4,9 +4,12 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "node --import=tsx  --watch  index.ts",
+    "dev": "node --import=tsx --watch index.ts",
+    "start": "node --import=tsx index.ts",
     "db:generate": "npx prisma generate",
-    "db:migrate": "npx prisma migrate"
+    "db:migrate": "npx prisma migrate",
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
