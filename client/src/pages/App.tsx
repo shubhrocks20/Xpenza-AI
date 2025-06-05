@@ -1,4 +1,3 @@
-import { Currency } from "lucide-react";
 import { LoginForm } from "../components/login-form";
 
 function App() {
@@ -11,7 +10,10 @@ function App() {
             className="flex items-center gap-2 self-center font-medium"
           >
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <img src="/public\Flux_Dev_A_sleek_futuristic_fintech_logo_for_an_AIpowered_expe_3.jpg" className="w-fit object-contain" />
+              <img
+                src="/public\Flux_Dev_A_sleek_futuristic_fintech_logo_for_an_AIpowered_expe_3.jpg"
+                className="w-fit object-contain"
+              />
             </div>
             Xpenza
           </a>
