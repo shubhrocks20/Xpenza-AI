@@ -1,5 +1,5 @@
 import { LoginForm } from "../components/login-form";
-
+import Logo from '/Logo.jpg'
 function App() {
   return (
     <>
@@ -11,7 +11,7 @@ function App() {
           >
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <img
-                src="/public\Flux_Dev_A_sleek_futuristic_fintech_logo_for_an_AIpowered_expe_3.jpg"
+                src={Logo}
                 className="w-fit object-contain"
               />
             </div>
