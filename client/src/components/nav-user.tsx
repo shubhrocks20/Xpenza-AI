@@ -118,7 +118,10 @@ export function NavUser({
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => {
-                Cookies.remove("access_token")
+                 Cookies.remove("access_token", {
+                  domain: ".kshubham.me",
+                  path: "/",
+                });
                 window.location.reload()
               }}>
                 <LogOut />

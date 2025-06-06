@@ -44,11 +44,10 @@ export const userController = {
         id: user.providerId,
       });
       res.cookie("access_token", local_access_token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: "none",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        domain: ".kshubham.me",
       });
 
       res.json({ success: true, message: "User successful login" });
@@ -87,11 +86,10 @@ export const userController = {
         id: data.sub,
       });
       res.cookie("access_token", local_access_token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: "none",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        domain: ".kshubham.me",
       });
 
       res.json({ success: true, message: "User successful login" });
@@ -150,11 +148,10 @@ export const userController = {
       });
 
       res.cookie("access_token", local_access_token, {
-        httpOnly: true,
+         httpOnly: false,
         secure: true,
         sameSite: "none",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        domain: ".kshubham.me",
       });
 
       res.json({ success: true, message: "User successfully logged in" });
