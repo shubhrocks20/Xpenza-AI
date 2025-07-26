@@ -4,7 +4,7 @@ import createHttpError from "http-errors";
 import { prisma } from "../../prisma";
 import { jwtHelper } from "../../shared/jwtHelper";
 import { AuthRequest } from "../../middlewares/authMiddleware";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { uploadOnCloudinary } from "../../shared/cloudinary";
 import { generateText } from "../../shared/textRecognition";
 import { ENV, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "../../config";
